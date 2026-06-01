@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pelegorn — The One Ring 2e</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5eed8;
+    --parchment-dark: #e8dfc0;
+    --ink: #1a1209;
+    --ink-light: #3d2e18;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --gold-muted: #c9a84c;
+    --elvish-teal: #2a5c52;
+    --elvish-teal-light: #3a7a6e;
+    --shadow-red: #8b1a1a;
+    --shadow-amber: #c45e00;
+    --hope-blue: #1a3a5c;
+    --border: rgba(100, 75, 30, 0.25);
+    --border-strong: rgba(100, 75, 30, 0.5);
+  }
+
+  body {
+    background: #1a1209;
+    font-family: 'Crimson Pro', Georgia, serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .sheet {
+    max-width: 820px;
+    margin: 0 auto;
+    background: var(--parchment);
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(184,134,11,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(42,92,82,0.06) 0%, transparent 50%);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--ink);
+    background-image: linear-gradient(135deg, #1a1209 0%, #2d1f0a 50%, #1a1209 100%);
+    padding: 28px 24px 20px;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L55 17 L55 43 L30 55 L5 43 L5 17 Z' fill='none' stroke='rgba(184,134,11,0.08)' stroke-width='1'/%3E%3C/svg%3E") repeat;
+    opacity: 0.5;
+  }
+  .rune-bar {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--gold-muted);
+    letter-spacing: 6px;
+    margin-bottom: 10px;
+    opacity: 0.7;
+    position: relative;
+  }
+  .char-name {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 4px;
+    text-shadow: 0 0 40px rgba(212,160,23,0.4), 0 2px 4px rgba(0,0,0,0.8);
+    position: relative;
+    line-height: 1;
+  }
+  .char-subtitle {
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+    font-size: 15px;
+    color: rgba(245,238,216,0.7);
+    margin-top: 8px;
+    position: relative;
+    letter-spacing: 0.5px;
+  }
+  .culture-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 4px 16px;
+    border: 1px solid var(--elvish-teal-light);
+    border-radius: 2px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--elvish-teal-light);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  /* MAIN GRID */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .col-left { border-right: 1px solid var(--border-strong); }
+
+  /* SECTIONS */
+  .section {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(184,134,11,0.3);
+  }
+
+  /* TRACKERS ROW */
+  .trackers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 16px 18px;
+    background: var(--parchment-dark);
+    border-bottom: 2px solid var(--border-strong);
+  }
+  .tracker { text-align: center; }
+  .tracker-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .tracker-display {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .tracker-display.endurance { color: var(--elvish-teal); }
+  .tracker-display.hope { color: var(--hope-blue); }
+  .tracker-display.shadow { color: #6b2020; }
+  .tracker-display.fellowship { color: var(--gold); }
+  .tracker-max {
+    font-family: 'Crimson Pro', serif;
+    font-size: 11px;
+    color: var(--ink-light);
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+  .tracker-btns {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .btn {
+    width: 32px; height: 32px;
+    border-radius: 3px;
+    border: 1px solid var(--border-strong);
+    background: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .btn:active { background: var(--parchment-dark); transform: scale(0.95); }
+  .btn.minus { color: var(--shadow-red); border-color: rgba(139,26,26,0.3); }
+  .btn.plus { color: var(--elvish-teal); border-color: rgba(42,92,82,0.3); }
+
+  /* CONDITIONS */
+  .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .status-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .status-check input { display: none; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 2px;
+    background: var(--parchment);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  /* checkmark via CSS only — no placeholder text */
+  .check-box::after {
+    content: '';
+    display: block;
+    width: 5px; height: 9px;
+    border-right: 2px solid transparent;
+    border-bottom: 2px solid transparent;
+    transform: rotate(45deg) translate(-1px, -1px);
+    transition: border-color 0.15s;
+  }
+  .status-check input:checked + .check-box {
+    background: var(--shadow-red);
+    border-color: var(--shadow-red);
+  }
+  .status-check input:checked + .check-box::after {
+    border-color: white;
+  }
+  .check-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--ink-light);
+  }
+
+  /* ATTRIBUTES */
+  .attr-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(100,75,30,0.1);
+  }
+  .attr-row:last-child { border-bottom: none; }
+  .attr-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; color: var(--ink-light); letter-spacing: 1px; }
+  .attr-vals { display: flex; gap: 12px; }
+  .attr-val { text-align: center; }
+  .attr-val span { display: block; }
+  .attr-num { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: var(--ink); }
+  .attr-tn { font-size: 11px; color: var(--gold); font-family: 'Crimson Pro', serif; }
+  .attr-sublabel { font-size: 9px; color: var(--ink-light); opacity: 0.5; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* SKILLS */
+  .skill-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(100,75,30,0.08);
+  }
+  .skill-row:last-child { border-bottom: none; }
+  .skill-name { font-family: 'Crimson Pro', serif; font-size: 14px; color: var(--ink); flex: 1; }
+  .skill-name.favoured { font-weight: 700; color: var(--elvish-teal); }
+  .skill-dots { display: flex; gap: 3px; margin: 0 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--border-strong); background: transparent; }
+  .dot.filled { background: var(--ink); border-color: var(--ink); }
+  .dot.favoured-filled { background: var(--elvish-teal); border-color: var(--elvish-teal); }
+  .skill-fav { font-size: 9px; color: var(--elvish-teal); font-family: 'Cinzel', serif; letter-spacing: 1px; width: 14px; text-align: right; }
+  .skill-group-header {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold-muted);
+    text-transform: uppercase;
+    padding: 4px 0 2px;
+    margin-top: 6px;
+    border-bottom: 1px solid rgba(184,134,11,0.2);
+    margin-bottom: 2px;
+  }
+
+  /* COMBAT PROFS */
+  .prof-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(100,75,30,0.08);
+  }
+  .prof-row:last-child { border-bottom: none; }
+  .prof-name { font-family: 'Crimson Pro', serif; font-size: 14px; }
+  .prof-name.active { font-weight: 700; color: var(--ink); }
+  .prof-name.inactive { color: var(--ink-light); opacity: 0.4; }
+  .prof-rating { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: var(--ink); min-width: 24px; text-align: center; }
+  .prof-rating.zero { opacity: 0.25; }
+
+  /* GEAR */
+  .gear-item { padding: 6px 0; border-bottom: 1px solid rgba(100,75,30,0.1); }
+  .gear-item:last-child { border-bottom: none; }
+  .gear-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; color: var(--ink); letter-spacing: 0.5px; }
+  .gear-stats { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--ink-light); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .gear-stat-val { display: flex; flex-direction: column; }
+  .gear-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-muted); font-family: 'Cinzel', serif; }
+
+  /* SPECIAL BOXES */
+  .special-box { background: rgba(42,92,82,0.06); border: 1px solid rgba(42,92,82,0.2); border-radius: 3px; padding: 10px 12px; margin-bottom: 8px; }
+  .special-box-title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600; color: var(--elvish-teal); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .special-box-text { font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-size: 13px; color: var(--ink-light); line-height: 1.5; }
+  .warning-box { background: rgba(139,26,26,0.05); border: 1px solid rgba(139,26,26,0.2); border-radius: 3px; padding: 10px 12px; margin-bottom: 8px; }
+  .warning-box .special-box-title { color: var(--shadow-red); }
+
+  /* QUICK ROLLS */
+  .quick-roll { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid rgba(100,75,30,0.08); }
+  .quick-roll:last-child { border-bottom: none; }
+  .quick-task { font-family: 'Crimson Pro', serif; font-size: 14px; color: var(--ink); flex: 1; }
+  .quick-dice { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); text-align: right; letter-spacing: 0.5px; }
+
+  /* DERIVED */
+  .derived-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .derived-item { text-align: center; padding: 8px 4px; border: 1px solid var(--border); border-radius: 3px; background: rgba(255,255,255,0.2); }
+  .derived-label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold-muted); display: block; margin-bottom: 2px; }
+  .derived-val { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; color: var(--ink); }
+
+  /* FEATURES */
+  .feature-pill { display: inline-block; padding: 3px 10px; border: 1px solid var(--border-strong); border-radius: 2px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; color: var(--ink-light); margin: 3px 3px 3px 0; background: rgba(255,255,255,0.3); }
+  .feature-pill.primary { border-color: var(--elvish-teal); color: var(--elvish-teal); background: rgba(42,92,82,0.07); }
+
+  /* VOICE QUOTE */
+  .voice-quote { font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-size: 14px; color: var(--ink-light); padding: 12px 16px; border-left: 3px solid var(--gold-muted); margin: 4px 0; line-height: 1.6; opacity: 0.8; }
+
+  /* FULL WIDTH */
+  .full-width { grid-column: 1 / -1; }
+
+  /* NOTES */
+  .notes-area {
+    width: 100%;
+    min-height: 140px;
+    background: rgba(255,255,255,0.3);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.6;
+    resize: vertical;
+    -webkit-appearance: none;
+  }
+  .notes-area:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(255,255,255,0.5);
+  }
+  .notes-area::placeholder {
+    color: var(--ink-light);
+    opacity: 0.4;
+    font-style: italic;
+  }
+  .notes-saved {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--elvish-teal);
+    opacity: 0;
+    margin-top: 4px;
+    transition: opacity 0.3s;
+    text-transform: uppercase;
+  }
+  .notes-saved.show { opacity: 1; }
+
+  /* ACTION BUTTONS */
+  .action-row {
+    display: flex;
+    gap: 10px;
+    padding: 14px 18px;
+    background: var(--parchment-dark);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--ink-light);
+    cursor: pointer;
+    text-transform: uppercase;
+    -webkit-tap-highlight-color: transparent;
+    text-align: center;
+  }
+  .action-btn:active { background: var(--parchment); }
+  .action-btn.export-btn {
+    border-color: var(--gold-muted);
+    color: var(--gold);
+  }
+  .action-btn.export-btn:active { background: rgba(184,134,11,0.1); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--gold-light);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 12px 24px;
+    border-radius: 3px;
+    border: 1px solid var(--gold-muted);
+    transition: transform 0.3s ease;
+    z-index: 100;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* FOOTER */
+  .footer { background: var(--ink); padding: 16px 24px; text-align: center; }
+  .footer-text { font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-size: 13px; color: rgba(245,238,216,0.4); letter-spacing: 0.5px; }
+
+  @media (max-width: 600px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .col-left { border-right: none; }
+    .char-name { font-size: 32px; }
+    .trackers { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="rune-bar">✦ &nbsp; ERIADOR &nbsp; ✦ &nbsp; THE ONE RING 2E &nbsp; ✦ &nbsp; WARDEN &nbsp; ✦</div>
+    <div class="char-name">PELEGORN</div>
+    <div class="char-subtitle">A swift, keen-eyed Elf of Lindon who watches the old roads for signs of the Shadow</div>
+    <div class="culture-badge">Elf of Lindon &nbsp;·&nbsp; Age 286 &nbsp;·&nbsp; Bree</div>
+  </div>
+
+  <!-- LIVE TRACKERS -->
+  <div class="trackers">
+    <div class="tracker">
+      <span class="tracker-label">Endurance</span>
+      <div class="tracker-display endurance" id="end-val">25</div>
+      <div class="tracker-max" id="end-max-label">of 25</div>
+      <div class="tracker-btns">
+        <button class="btn minus" onclick="adjust('end',-1)">−</button>
+        <button class="btn plus" onclick="adjust('end',+1)">+</button>
+      </div>
+    </div>
+    <div class="tracker">
+      <span class="tracker-label">Hope</span>
+      <div class="tracker-display hope" id="hope-val">12</div>
+      <div class="tracker-max">of 12</div>
+      <div class="tracker-btns">
+        <button class="btn minus" onclick="adjust('hope',-1)">−</button>
+        <button class="btn plus" onclick="adjust('hope',+1)">+</button>
+      </div>
+    </div>
+    <div class="tracker">
+      <span class="tracker-label">Shadow</span>
+      <div class="tracker-display shadow" id="shad-val">0</div>
+      <div class="tracker-max">&nbsp;</div>
+      <div class="tracker-btns">
+        <button class="btn minus" onclick="adjust('shad',-1)">−</button>
+        <button class="btn plus" onclick="adjust('shad',+1)">+</button>
+      </div>
+    </div>
+    <div class="tracker">
+      <span class="tracker-label">Fellowship</span>
+      <div class="tracker-display fellowship" id="fellow-val">0</div>
+      <div class="tracker-max" id="fellow-max-label">&nbsp;</div>
+      <div class="tracker-btns">
+        <button class="btn minus" onclick="adjust('fellow',-1)">−</button>
+        <button class="btn plus" onclick="adjust('fellow',+1)">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDITIONS -->
+  <div class="section" style="background: var(--parchment-dark); padding: 10px 18px;">
+    <div style="font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:var(--gold-muted); text-transform:uppercase; margin-bottom:6px;">Conditions</div>
+    <div class="status-row">
+      <label class="status-check"><input type="checkbox" id="weary" onchange="saveConditions()"><span class="check-box"></span><span class="check-label">Weary</span></label>
+      <label class="status-check"><input type="checkbox" id="miserable" onchange="saveConditions()"><span class="check-box"></span><span class="check-label">Miserable</span></label>
+      <label class="status-check"><input type="checkbox" id="wounded" onchange="saveConditions()"><span class="check-box"></span><span class="check-label">Wounded</span></label>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT COL -->
+    <div class="col-left">
+
+      <!-- ATTRIBUTES -->
+      <div class="section">
+        <div class="section-title">Attributes</div>
+        <div class="attr-row">
+          <span class="attr-name">Strength</span>
+          <div class="attr-vals">
+            <div class="attr-val"><span class="attr-num">5</span><span class="attr-sublabel">Attr</span></div>
+            <div class="attr-val"><span class="attr-num attr-tn">14</span><span class="attr-sublabel">TN*</span></div>
+          </div>
+        </div>
+        <div class="attr-row">
+          <span class="attr-name">Heart</span>
+          <div class="attr-vals">
+            <div class="attr-val"><span class="attr-num">4</span><span class="attr-sublabel">Attr</span></div>
+            <div class="attr-val"><span class="attr-num attr-tn">16</span><span class="attr-sublabel">TN</span></div>
+          </div>
+        </div>
+        <div class="attr-row">
+          <span class="attr-name" style="color:var(--elvish-teal);">Wits ★</span>
+          <div class="attr-vals">
+            <div class="attr-val"><span class="attr-num">5</span><span class="attr-sublabel">Attr</span></div>
+            <div class="attr-val"><span class="attr-num attr-tn">15</span><span class="attr-sublabel">TN</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px; color:var(--ink-light); opacity:0.6; margin-top:8px; font-style:italic;">★ Favoured &nbsp;·&nbsp; * Prowess: Strength −1</div>
+      </div>
+
+      <!-- COMBAT STATS -->
+      <div class="section">
+        <div class="section-title">Combat Stats</div>
+        <div class="derived-grid">
+          <div class="derived-item"><span class="derived-label">Parry</span><span class="derived-val">17</span></div>
+          <div class="derived-item"><span class="derived-label">Load</span><span class="derived-val">8</span></div>
+        </div>
+      </div>
+
+      <!-- BEST ROLLS -->
+      <div class="section">
+        <div class="section-title">Best Rolls</div>
+        <div class="quick-roll"><span class="quick-task">🏹 Shoot (Rearward)</span><span class="quick-dice">Bows 3 · TN 14 · Dmg 4</span></div>
+        <div class="quick-roll"><span class="quick-task">👁 Spot danger</span><span class="quick-dice">Aware 3 Fav · TN 14</span></div>
+        <div class="quick-roll"><span class="quick-task">🌿 Sneak</span><span class="quick-dice">Stealth 3 · TN 15</span></div>
+        <div class="quick-roll"><span class="quick-task">📜 Old lore</span><span class="quick-dice">Lore 3 Fav · TN 15</span></div>
+        <div class="quick-roll"><span class="quick-task">🗡 Spear (Open)</span><span class="quick-dice">Spears 1 · TN 14 · Dmg 4</span></div>
+        <div class="quick-roll"><span class="quick-task">Heavy Blow (bow)</span><span class="quick-dice">4 + 5 = 9 Endurance</span></div>
+      </div>
+
+      <!-- WAR GEAR -->
+      <div class="section">
+        <div class="section-title">War Gear</div>
+        <div class="gear-item">
+          <div class="gear-name">⚔ Grievous Bow</div>
+          <div class="gear-stats">
+            <div class="gear-stat-val"><span class="gear-stat-label">Dmg</span>4</div>
+            <div class="gear-stat-val"><span class="gear-stat-label">Injury</span>14</div>
+            <div class="gear-stat-val"><span class="gear-stat-label">Load</span>2</div>
+          </div>
+        </div>
+        <div class="gear-item">
+          <div class="gear-name">Spear</div>
+          <div class="gear-stats">
+            <div class="gear-stat-val"><span class="gear-stat-label">Dmg</span>4</div>
+            <div class="gear-stat-val"><span class="gear-stat-label">Injury</span>14/16</div>
+            <div class="gear-stat-val"><span class="gear-stat-label">Load</span>3</div>
+          </div>
+        </div>
+        <div class="gear-item">
+          <div class="gear-name">Leather Shirt</div>
+          <div class="gear-stats">
+            <div class="gear-stat-val"><span class="gear-stat-label">Prot</span>1d</div>
+            <div class="gear-stat-val"><span class="gear-stat-label">Load</span>3</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COL -->
+    <div>
+
+      <!-- SKILLS -->
+      <div class="section">
+        <div class="section-title">Skills</div>
+
+        <div class="skill-group-header">Strength</div>
+        <div class="skill-row"><span class="skill-name">Awe</span><div class="skill-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Athletics</span><div class="skill-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name favoured">Awareness ★</span><div class="skill-dots"><div class="dot favoured-filled"></div><div class="dot favoured-filled"></div><div class="dot favoured-filled"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav">FAV</span></div>
+        <div class="skill-row"><span class="skill-name">Hunting</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Song</span><div class="skill-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Craft</span><div class="skill-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+
+        <div class="skill-group-header">Heart</div>
+        <div class="skill-row"><span class="skill-name">Enhearten</span><div class="skill-dots"><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Travel</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name favoured">Insight ★</span><div class="skill-dots"><div class="dot favoured-filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav">FAV</span></div>
+        <div class="skill-row"><span class="skill-name">Healing</span><div class="skill-dots"><div class="dot filled"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Courtesy</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Battle</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+
+        <div class="skill-group-header">Wits</div>
+        <div class="skill-row"><span class="skill-name">Persuade</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Stealth</span><div class="skill-dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name" style="color:var(--shadow-amber);">Scan ⚠</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Explore</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name">Riddle</span><div class="skill-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav"></span></div>
+        <div class="skill-row"><span class="skill-name favoured">Lore ★</span><div class="skill-dots"><div class="dot favoured-filled"></div><div class="dot favoured-filled"></div><div class="dot favoured-filled"></div><div class="dot"></div><div class="dot"></div></div><span class="skill-fav">FAV</span></div>
+      </div>
+
+      <!-- COMBAT PROFS -->
+      <div class="section">
+        <div class="section-title">Combat Proficiencies</div>
+        <div class="prof-row"><span class="prof-name inactive">Axes</span><span class="prof-rating zero">0</span></div>
+        <div class="prof-row"><span class="prof-name active">Bows</span><span class="prof-rating">3</span></div>
+        <div class="prof-row"><span class="prof-name active">Spears</span><span class="prof-rating">1</span></div>
+        <div class="prof-row"><span class="prof-name inactive">Swords</span><span class="prof-rating zero">0</span></div>
+      </div>
+
+    </div>
+
+    <!-- FULL WIDTH: ABILITIES -->
+    <div class="full-width section">
+      <div class="section-title">Abilities & Features</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div class="special-box">
+          <div class="special-box-title">Elven-skill (Cultural Blessing)</div>
+          <div class="special-box-text">Spend 1 Hope before a Skill roll (while not Miserable) to achieve a Magical success.</div>
+        </div>
+        <div class="warning-box">
+          <div class="special-box-title">The Long Defeat (Weakness)</div>
+          <div class="special-box-text">During Fellowship Phase, can remove only a maximum of 1 Shadow point.</div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+        <div class="special-box">
+          <div class="special-box-title">Virtue — Prowess: Strength</div>
+          <div class="special-box-text">Strength TN reduced by 1 (from 15 to 14).</div>
+        </div>
+        <div class="special-box">
+          <div class="special-box-title">Reward — Grievous Bow</div>
+          <div class="special-box-text">Bow damage increased by 1 (from 3 to 4). Heavy Blow = 4+5 = 9 Endurance.</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:var(--gold-muted); text-transform:uppercase; margin-bottom:6px;">Distinctive Features</div>
+        <span class="feature-pill primary">Keen-eyed</span>
+        <span class="feature-pill primary">Swift</span>
+        <span class="feature-pill primary">Shadow-lore</span>
+        <div style="font-family:'Crimson Pro',serif; font-size:12px; color:var(--ink-light); margin-top:6px; font-style:italic;">When one clearly applies, ask LM to be Inspired: spend 1 Hope for +2d instead of +1d.</div>
+      </div>
+    </div>
+
+    <!-- FULL WIDTH: AWARENESS vs SCAN -->
+    <div class="full-width section" style="background: rgba(42,92,82,0.04);">
+      <div class="section-title">⚠ Awareness vs Scan</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-family:'Crimson Pro',serif; font-size:13px;">
+        <div>
+          <div style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; color:var(--elvish-teal); margin-bottom:6px;">AWARENESS (passive noticing)</div>
+          Movement in trees · Spotting ambush · Keeping watch · Anything unexpected
+        </div>
+        <div>
+          <div style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:1px; color:var(--shadow-amber); margin-bottom:6px;">SCAN (active searching) — Scan 0 ⚠</div>
+          Searching a room · Hidden doors · Examining a body · Tracking on ground
+        </div>
+      </div>
+    </div>
+
+    <!-- FULL WIDTH: CHARACTER VOICE -->
+    <div class="full-width section">
+      <div class="section-title">Character Voice</div>
+      <div class="voice-quote">"There is movement where the wind does not reach."</div>
+      <div class="voice-quote">"Many of my kin look west. I am not finished looking east."</div>
+      <div class="voice-quote">"The road is watched. Whether by friend or foe, I cannot yet say."</div>
+    </div>
+
+    <!-- FULL WIDTH: SESSION NOTES -->
+    <div class="full-width section">
+      <div class="section-title">Session Notes</div>
+      <textarea
+        id="session-notes"
+        class="notes-area"
+        placeholder="NPCs met, places visited, things to remember, loose threads..."
+        oninput="saveNotes()"
+      ></textarea>
+      <div class="notes-saved" id="notes-saved-indicator">Saved</div>
+    </div>
+
+  </div><!-- end main-grid -->
+
+  <!-- ACTION ROW -->
+  <div class="action-row">
+    <button class="action-btn export-btn" onclick="exportState()">⬆ Export for Debrief</button>
+    <button class="action-btn" onclick="resetAll()">↺ Reset Trackers</button>
+    <button class="action-btn" onclick="clearNotes()">✕ Clear Notes</button>
+  </div>
+
+  <div class="footer">
+    <div class="footer-text">Pelegorn of Lindon &nbsp;·&nbsp; Warden &nbsp;·&nbsp; The One Ring 2e &nbsp;·&nbsp; Updated 2026-06-01</div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  const MAX    = { end: 25, hope: 12, shad: 99, fellow: 12 };
+  const MIN    = { end: 0,  hope: 0,  shad: 0,  fellow: 0  };
+  const IDS    = { end: 'end-val', hope: 'hope-val', shad: 'shad-val', fellow: 'fellow-val' };
+  const STORE  = { end: 'tor-end', hope: 'tor-hope', shad: 'tor-shad', fellow: 'tor-fellow' };
+
+  function load(key, fallback) {
+    const v = parseInt(localStorage.getItem(key));
+    return isNaN(v) ? fallback : v;
+  }
+  const state = {
+    end:    load('tor-end',    25),
+    hope:   load('tor-hope',   12),
+    shad:   load('tor-shad',   0),
+    fellow: load('tor-fellow', 0),
+  };
+
+  // ── Init ───────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    // Restore trackers
+    Object.keys(state).forEach(k => {
+      document.getElementById(IDS[k]).textContent = state[k];
+      applyColour(k);
+    });
+
+    // Restore conditions
+    const cond = JSON.parse(localStorage.getItem('tor-conditions') || '{}');
+    ['weary','miserable','wounded'].forEach(id => {
+      if (cond[id]) document.getElementById(id).checked = true;
+    });
+
+    // Restore notes
+    const notes = localStorage.getItem('tor-notes') || '';
+    document.getElementById('session-notes').value = notes;
+  });
+
+  // ── Tracker adjustment ────────────────────────────────
+  function adjust(key, delta) {
+    state[key] = Math.max(MIN[key], Math.min(MAX[key], state[key] + delta));
+    document.getElementById(IDS[key]).textContent = state[key];
+    localStorage.setItem(STORE[key], state[key]);
+    applyColour(key);
+  }
+
+  function applyColour(key) {
+    const el = document.getElementById(IDS[key]);
+    if (key === 'end') {
+      el.style.color = state.end <= 8  ? 'var(--shadow-red)'
+                     : state.end <= 15 ? 'var(--shadow-amber)'
+                     : 'var(--elvish-teal)';
+    }
+    if (key === 'hope') {
+      el.style.color = state.hope <= 3 ? 'var(--shadow-red)' : 'var(--hope-blue)';
+    }
+    if (key === 'shad') {
+      el.style.color = state.shad >= 8 ? 'var(--shadow-red)'
+                     : state.shad >= 4 ? 'var(--shadow-amber)'
+                     : '#6b2020';
+    }
+    if (key === 'fellow') {
+      el.style.color = state.fellow === 0 ? 'rgba(184,134,11,0.35)' : 'var(--gold)';
+    }
+  }
+
+  // ── Conditions ────────────────────────────────────────
+  function saveConditions() {
+    const cond = {};
+    ['weary','miserable','wounded'].forEach(id => {
+      cond[id] = document.getElementById(id).checked;
+    });
+    localStorage.setItem('tor-conditions', JSON.stringify(cond));
+  }
+
+  // ── Notes ─────────────────────────────────────────────
+  let noteTimer;
+  function saveNotes() {
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => {
+      localStorage.setItem('tor-notes', document.getElementById('session-notes').value);
+      const ind = document.getElementById('notes-saved-indicator');
+      ind.classList.add('show');
+      setTimeout(() => ind.classList.remove('show'), 1500);
+    }, 600);
+  }
+
+  function clearNotes() {
+    if (!confirm('Clear all session notes?')) return;
+    document.getElementById('session-notes').value = '';
+    localStorage.removeItem('tor-notes');
+    showToast('Notes cleared');
+  }
+
+  // ── Export ────────────────────────────────────────────
+  function exportState() {
+    const cond = [];
+    if (document.getElementById('weary').checked)     cond.push('Weary');
+    if (document.getElementById('miserable').checked) cond.push('Miserable');
+    if (document.getElementById('wounded').checked)   cond.push('Wounded');
+
+    const notes = document.getElementById('session-notes').value.trim();
+    const now   = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+    const text = [
+      '=== PELEGORN — SESSION DEBRIEF ===',
+      `Date: ${now}`,
+      '',
+      '-- TRACKERS --',
+      `Endurance:   ${state.end} / 25`,
+      `Hope:        ${state.hope} / 12`,
+      `Shadow:      ${state.shad}`,
+      `Fellowship:  ${state.fellow}`,
+      `Conditions:  ${cond.length ? cond.join(', ') : 'None'}`,
+      '',
+      notes ? `-- SESSION NOTES --\n${notes}` : '',
+      '',
+      '=== END ===',
+    ].filter(l => l !== null).join('\n');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied — paste into Claude');
+      }).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied — paste into Claude');
+  }
+
+  // ── Reset ─────────────────────────────────────────────
+  function resetAll() {
+    if (!confirm('Reset all trackers to starting values?')) return;
+    state.end = 25; state.hope = 12; state.shad = 0; state.fellow = 0;
+    Object.keys(state).forEach(k => {
+      document.getElementById(IDS[k]).textContent = state[k];
+      localStorage.setItem(STORE[k], state[k]);
+      applyColour(k);
+    });
+    ['weary','miserable','wounded'].forEach(id => {
+      document.getElementById(id).checked = false;
+    });
+    localStorage.removeItem('tor-conditions');
+    showToast('Trackers reset');
+  }
+
+  // ── Toast ─────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
